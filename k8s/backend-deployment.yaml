@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fashion-backend
+  namespace: fashion-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fashion-backend
+  template:
+    metadata:
+      labels:
+        app: fashion-backend
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
+      containers:
+        - name: fashion-backend
+          image: 021859068728.dkr.ecr.us-east-1.amazonaws.com/fashion-backend:v1
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_URL
+              value: "mongodb://host.docker.internal:27017/fashion-store"
+            - name: PORT
+              value: "5000"

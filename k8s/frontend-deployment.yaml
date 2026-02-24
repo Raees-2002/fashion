@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fashion-frontend
+  namespace: fashion-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fashion-frontend
+  template:
+    metadata:
+      labels:
+        app: fashion-frontend
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
+      containers:
+        - name: fashion-frontend
+          image: 021859068728.dkr.ecr.us-east-1.amazonaws.com/fashion-frontend:v1
+          ports:
+            - containerPort: 80
