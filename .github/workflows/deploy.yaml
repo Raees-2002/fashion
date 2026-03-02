@@ -1,7 +1,4 @@
-name: build-and-deploy
-
-permissions:
-  contents: write
+name: Deploy to Kubernetes
 
 on:
   push:
@@ -43,8 +40,6 @@ jobs:
 
     - name: commit updated manifest
       run: |
-        git config user.name "github-actions"
-        git config user.email "actions@github.com"
-        git add k8s/backend-deployment.yaml
-        git commit -m "update backend image tag"
-        git push
+        kubectl set image deployment/fashion-frontend \
+        fashion-frontend=fashion-frontend:latest \
+        -n fashion-platform
