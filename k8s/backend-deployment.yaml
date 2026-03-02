@@ -22,6 +22,6 @@ spec:
             - containerPort: 5000
           env:
             - name: DB_URL
-              value: "mongodb://host.docker.internal:27017/fashion-store"
+              value: "mongodb://mongo:27017/fashion-store"
             - name: PORT
               value: "5000"
