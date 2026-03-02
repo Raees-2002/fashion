@@ -17,7 +17,7 @@ spec:
         - name: ecr-secret
       containers:
         - name: fashion-backend
-          image: 021859068728.dkr.ecr.us-east-1.amazonaws.com/fashion-backend:v1
+          image: 021859068728.dkr.ecr.us-east-1.amazonaws.com/fashion-backend:3b7d9bef6189406f07e4e37d15e2bbffba7a965a
           ports:
             - containerPort: 5000
           env:
