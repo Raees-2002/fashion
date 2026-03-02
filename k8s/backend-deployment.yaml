@@ -25,3 +25,4 @@ spec:
               value: "mongodb://mongo:27017/fashion-store"
             - name: PORT
               value: "5000"
+              #env file is used in the dockerfile, so we need to set the environment variables here as well
