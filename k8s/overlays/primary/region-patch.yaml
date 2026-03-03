@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fashion-frontend
+spec:
+  template:
+    spec:
+      containers:
+        - name: fashion-frontend
+          env:
+            - name: REGION
+              value: us-east-1
