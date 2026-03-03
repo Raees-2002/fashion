@@ -1,4 +1,4 @@
-name: Deploy to Kubernetes
+name: Deploy to Kubernetes (GitOps)
 
 permissions:
   contents: write
@@ -9,47 +9,42 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: checkout code
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: configure aws credentials
+    - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: login to ecr
+    - name: Login to ECR
       run: |
-        aws ecr get-login-password --region $AWS_REGION | \
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
         docker login --username AWS --password-stdin \
         ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-    - name: build backend image
+    - name: Build and Push Backend Image
       run: |
+        IMAGE=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fashion-backend:${{ github.sha }}
         docker build -t fashion-backend ./api
-        docker tag fashion-backend:latest 
-        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fashion-backend:${{ github.sha }}
-        docker push \
-        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fashion-backend:${{ github.sha }}
+        docker tag fashion-backend:latest $IMAGE
+        docker push $IMAGE
 
+    - name: Update Kustomize image tag (Primary + DR)
+      run: |
+        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/overlays/primary/kustomization.yaml
+        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/overlays/dr/kustomization.yaml
 
-
-    - name: commit updated manifest
+    - name: Commit and Push changes
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
         git add .
-        git commit -m "update backend image to ${{ github.sha }}"
+        git commit -m "Update backend image to ${{ github.sha }}" || echo "No changes to commit"
         git push
-
-    - name: update k8s image tag
-
-      run: |
-        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/base/backend-deployment.yaml
-        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/base/frontend-deployment.yaml
-
