@@ -39,7 +39,7 @@ jobs:
 
     - name: update k8s image tag
       run: |
-        sed -i "s|fashion-backend:.*|fashion-backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+        sed -i "s|fashion-backend:.*|fashion-backend:${{ github.sha }}|g" k8s/base/backend-deployment.yaml
 
     - name: commit updated manifest
       run: |
