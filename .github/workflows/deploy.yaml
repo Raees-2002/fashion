@@ -37,12 +37,19 @@ jobs:
         docker push \
         ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fashion-backend:${{ github.sha }}
 
-    - name: update k8s image tag
-      run: |
-        sed -i "s|fashion-backend:.*|fashion-backend:${{ github.sha }}|g" k8s/base/backend-deployment.yaml
+
 
     - name: commit updated manifest
       run: |
-        kubectl set image deployment/fashion-frontend \
-        fashion-frontend=fashion-frontend:latest \
-        -n fashion-platform
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add .
+        git commit -m "update backend image to ${{ github.sha }}"
+        git push
+
+    - name: update k8s image tag
+
+      run: |
+        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/overlays/primary/kustomization.yaml
+        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/overlays/dr/kustomization.yaml
+
