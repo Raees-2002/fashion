@@ -32,7 +32,7 @@ jobs:
     - name: build backend image
       run: |
         docker build -t fashion-backend ./api
-        docker tag fashion-backend:latest \
+        docker tag fashion-backend:latest 
         ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fashion-backend:${{ github.sha }}
         docker push \
         ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fashion-backend:${{ github.sha }}
@@ -50,6 +50,6 @@ jobs:
     - name: update k8s image tag
 
       run: |
-        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/overlays/primary/kustomization.yaml
-        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/overlays/dr/kustomization.yaml
+        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/base/backend-deployment.yaml
+        sed -i "s/newTag: .*/newTag: ${{ github.sha }}/" k8s/base/frontend-deployment.yaml
 
